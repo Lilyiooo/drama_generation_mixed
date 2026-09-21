@@ -1,0 +1,61 @@
+drama_types:
+  short:
+    name: "短剧"
+    role_desc: "你是一位资深的商业短剧编剧，擅长制造**高密度的爽点与反转**。你深知竖屏短剧的黄金法则：**情绪极致化、节奏秒级推进、拒绝任何无效铺垫**。写作时必须**去文学化、去心理描写**，只通过**强动作**和**高压台词**来推动剧情。"
+    style_config: "SHORT_CONFIG"
+    # 以下两个字段为降级默认值（当字数范围获取失败时使用）
+    scene_nums_min: 1
+    scene_nums_max: 3
+    word_nums: "1000-1400"
+    # 每场目标字数范围（用于计算场次数：场次数 = 每集字数 / 每场字数）
+    per_scene_word_range:
+      min: 600
+      max: 1200
+
+  cartoon:
+    name: "动漫"
+    role_desc: "你是一位资深的商业动漫编剧，拥有极强的**分镜画面思维**。你深知动画剧本的黄金法则：**用画面讲故事、动作夸张具有张力、充分利用动画的视觉表现力**（如特效、形变）。写作时必须**去文学化、去心理描写**，将所有心理活动外化为**具体的肢体语言或环境细节**。"
+    style_config: "CARTOON_CONFIG"
+    scene_nums_min: 1
+    scene_nums_max: 10
+    word_nums: "1000-10000"
+    # 动漫动态策略：当每集字数上限超过此阈值时，从一次性生成整集切换为逐场生成
+    cartoon_word_threshold: 3000
+    # 逐场生成时，每场的目标字数范围（用于计算场次数和传入单场提示词）
+    per_scene_word_range:
+      min: 800
+      max: 1200
+
+  short_cartoon:
+    name: "短番"
+    role_desc: "你是一位资深的商业短番（泡面番）编剧，擅长创作**脑洞大开、梗点密集**的微动画。你深知短番的黄金法则：**短小精悍、人设标签鲜明、结尾必有神转折或吐槽**。写作时必须**去文学化、去心理描写**，依靠**快节奏的对白**和**趣味性的动作**瞬间抓住观众。"
+    style_config: "SHORT_CARTOON_CONFIG"
+    # 以下两个字段为降级默认值（当字数范围获取失败时使用）
+    scene_nums_min: 1
+    scene_nums_max: 3
+    word_nums: "800-1200"
+    # 每场目标字数范围（用于计算场次数：场次数 = 每集字数 / 每场字数）
+    per_scene_word_range:
+      min: 600
+      max: 1200
+
+  long:
+    name: "电视剧"
+    role_desc: "你是一位资深的传统电视剧编剧，擅长构建宏大的叙事结构、错综复杂的人物关系以及细腻的情感流动。你深知长剧的创作核心：拒绝脸谱化、注重人物弧光（成长）、用潜台词和细节来传达言外之意，而非单纯追求快节奏冲突。"
+    style_config: "LONG_CONFIG"
+    scene_nums_min: 20
+    scene_nums_max: 30
+    word_nums: "20000-30000"
+
+  default:
+    name: "短番"
+    role_desc: "你是一位资深的商业短番（泡面番）编剧，擅长创作**脑洞大开、梗点密集**的微动画。你深知短番的黄金法则：**短小精悍、人设标签鲜明、结尾必有神转折或吐槽**。写作时必须**去文学化、去心理描写**，依靠**快节奏的对白**和**趣味性的动作**瞬间抓住观众。"
+    style_config: "SHORT_CARTOON_CONFIG"
+    scene_nums_min: 1
+    scene_nums_max: 3
+    word_nums: "800-1200"
+    # 每场目标字数范围（用于计算场次数：场次数 = 每集字数 / 每场字数）
+    per_scene_word_range:
+      min: 600
+      max: 1200
+  

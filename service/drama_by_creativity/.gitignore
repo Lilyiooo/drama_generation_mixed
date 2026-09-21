@@ -1,0 +1,11 @@
+# trpc 自动生成的代码和配置
+run.py
+cos_tools.py
+trpc.md
+
+# 配置文件（可能包含敏感信息）
+config.yaml
+
+# 备份文件
+*_backup.py
+*.bak 

@@ -1,0 +1,113 @@
+min_chapter_idx: 1
+max_chapter_idx: 250
+max_workers: 5
+
+gemini-2.5-pro:
+  model_type: venus
+  episode_batch_size: 60
+  content_max_word_cnt: 25000 # 内容截断长度（策划案生成）
+  turncat_word_cnt: 200000
+  summary_truncate_length: 200000
+
+gpt-5.5:
+  model_type: venus
+  episode_batch_size: 60
+  content_max_word_cnt: 25000
+  turncat_word_cnt: 200000
+  summary_truncate_length: 200000
+
+
+claude-opus-4-7:
+  model_type: venus
+  episode_batch_size: 60
+  content_max_word_cnt: 25000
+  turncat_word_cnt: 200000
+  summary_truncate_length: 200000
+
+deepseek-v4-flash:
+  model_type: venus
+  episode_batch_size: 40
+  content_max_word_cnt: 20000
+  turncat_word_cnt: 30000
+  summary_truncate_length: 30000
+
+deepseek-v4-pro-external:
+  model_type: venus
+  episode_batch_size: 40
+  content_max_word_cnt: 20000
+  turncat_word_cnt: 30000
+  summary_truncate_length: 30000
+
+gemma-4-31b-it:
+  model_type: venus
+  episode_batch_size: 40
+  content_max_word_cnt: 20000
+  turncat_word_cnt: 30000
+  summary_truncate_length: 30000
+
+kimi-k2.5:
+  model_type: venus
+  episode_batch_size: 60
+  content_max_word_cnt: 80000
+  turncat_word_cnt: 200000
+  summary_truncate_length: 100000
+
+qwen3-30b-a3b-instruct-2507:
+  model_type: venus
+  episode_batch_size: 40
+  content_max_word_cnt: 50000
+  turncat_word_cnt: 200000
+
+claude-sonnet-4-6:
+  model_type: venus
+  episode_batch_size: 60
+  content_max_word_cnt: 80000
+  turncat_word_cnt: 200000
+
+hy3-preview:
+  model_type: taiji
+  episode_batch_size: 60
+  content_max_word_cnt: 80000
+  turncat_word_cnt: 200000
+  summary_truncate_length: 200000
+
+hy3:
+  model_type: taiji
+  episode_batch_size: 60
+  content_max_word_cnt: 80000
+  turncat_word_cnt: 200000
+  summary_truncate_length: 200000
+
+qwen3.5-397b-a17b: # venus部署-64k
+  model_type: venus
+  episode_batch_size: 40
+  content_max_word_cnt: 20000
+  turncat_word_cnt: 30000
+  summary_truncate_length: 30000
+
+glm-5.2: # venus部署 195k
+  model_type: venus
+  episode_batch_size: 60
+  content_max_word_cnt: 80000
+  turncat_word_cnt: 200000
+  summary_truncate_length: 200000
+
+glm-5.2-external:
+  model_type: venus
+  episode_batch_size: 40
+  content_max_word_cnt: 50000
+  turncat_word_cnt: 200000
+
+kimi-k3:
+  model_type: venus
+  episode_batch_size: 60
+  content_max_word_cnt: 80000
+  turncat_word_cnt: 200000
+  summary_truncate_length: 200000
+
+kimi-k3-external:
+  model_type: venus
+  episode_batch_size: 60
+  content_max_word_cnt: 80000
+  turncat_word_cnt: 200000
+  summary_truncate_length: 200000

@@ -1,0 +1,3 @@
+numpy>=1.24
+# Recommended for the paper-aligned semantic backend:
+# sentence-transformers>=2.2

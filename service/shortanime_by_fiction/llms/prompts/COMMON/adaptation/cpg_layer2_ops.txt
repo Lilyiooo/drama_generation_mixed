@@ -1,0 +1,152 @@
+## 背景与架构说明
+
+你正在操作一个**因果情节图（Causal Plot Graph，CPG）**。CPG 是短番改编的核心数据结构，分两层：
+
+- **Plot 层**（上层）：故事弧，标识符格式为 `P00`、`P01` …
+- **Event 层**（下层）：叙事事件节点，标识符格式为 `P00-E00`、`P01-E03` …，节点间有有向因果边，构成 DAG。
+
+改编操作也分两层：
+
+- **第一层（Layer 1）**：结构意图操作，描述"要做什么"，如删除情节弧、压缩事件、扩展事件等。这些操作是高层语义，不能直接施加在图上。
+- **第二层（Layer 2）**：原子图操作，描述"具体改哪些节点和边"，可直接执行。
+
+**你的角色**：接收一批 Layer 1 ops，结合每个 op 附带的局部因果子图上下文，输出能精确实现这些意图的 Layer 2 原子操作序列。
+
+---
+
+## 任务
+
+以下是一批**第一层结构意图操作（Layer 1 ops）**。每个 op 内嵌了 `local_subgraph` 字段，包含该 op 相关的局部因果子图（种子节点 BFS ±3 跳范围内的事件与边），供你理解上下文、做出合理的因果决策。
+
+```json
+{Layer1Ops}
+```
+
+---
+
+## 第二层操作说明
+
+| op 类型      | 含义         | 必填参数                                                          | 可选参数              |
+|--------------|--------------|-------------------------------------------------------------------|-----------------------|
+| remove_node  | 删除节点     | event_id, reason                                                  |                       |
+| remove_edge  | 删除边       | src_id, dst_id, reason                                            |                       |
+| add_node     | 新增节点     | event（完整字段对象）, reason                                     |                       |
+| add_edge     | 新增边       | src_id, dst_id, edge_type, causal_strength, reason               |                       |
+| modify_node  | 修改节点字段 | event_id, fields（只列出变更字段）, reason                        |                       |
+
+---
+
+## ⚠️ 因果维护责任（重要）
+
+**系统不会自动处理任何边的重连。** 当你删除节点时，该节点的所有入边和出边也会随之消失。你必须主动决定：
+
+1. **是否需要重接因果链**：若删除的节点在叙事上是前后情节的"桥梁"，你需要显式 `add_edge` 连接其前驱和后继，保证因果链完整。
+2. **是否需要新增过渡节点**：若前驱和后继之间的因果跨度太大，直接相连叙事上不合理，可以 `add_node` 新增一个过渡事件，再 `add_edge` 连接。
+3. **是否可以断开**：若删除的节点所在情节弧整体被删除，且前后情节弧本来就相对独立，可以不重连（但需在 reason 中说明）。
+
+---
+
+## Layer 1 → Layer 2 对应关系
+
+- **delete_plot(P)**：
+  - 对 P 下所有节点依次 `remove_node`
+  - 检查 P 的边界节点（P 内有来自其他 Plot 的入边，或有指向其他 Plot 的出边），**显式处理跨 Plot 的因果边**：根据叙事逻辑决定是否 `add_edge` 直连、新增过渡节点，或 `remove_edge` 断开
+
+- **delete(E)**：
+  - `remove_node(E)`
+  - 分析 E 的前驱和后继，根据叙事逻辑决定是否重连
+
+- **compress(E1, E2 → E_new)**：
+  - `remove_node(E1)` + `remove_node(E2)`
+  - `add_node(E_new)`（内容应融合 E1+E2 的核心情节）
+  - 将原 E1 的入边接到 E_new，将原 E2 的出边从 E_new 出发（`add_edge`）
+
+- **expand(E → E_a, E_b)**：
+  - `remove_node(E)`
+  - `add_node(E_a)` + `add_node(E_b)`
+  - `add_edge(E_a → E_b)`
+  - 将原 E 的入边接到 E_a，将原 E 的出边从 E_b 出发（`add_edge`）
+
+- **insert(after=E_prev, E_new)**：
+  - `add_node(E_new)`
+  - `add_edge(E_prev → E_new)`
+  - 将原 E_prev 的出边改接到 E_new：先 `remove_edge(E_prev → E_next)`，再 `add_edge(E_new → E_next)`
+
+---
+
+## 注意事项
+
+1. 事件内容（title / synopsis / description / beat_type 等）必须符合叙事逻辑，与上下文因果连贯
+2. 新增节点使用 `{PlotId}-E{编号}` 格式的 id，避免与 local_subgraph 中已有节点冲突
+3. 每个 Layer 1 op 应映射为一到多个 Layer 2 ops，按执行顺序排列
+4. estimated_minutes 应贴近对应 Layer 1 op 的 target_minutes（若有）
+5. 边的 causal_strength 范围 0.0~1.0，edge_type 可选：causes / enables / foreshadows / triggers / motivates
+6. **每个 op 必须包含 reason 字段**，简要说明为什么做这个操作（如"删除此节点以完成 P02 整体删除"、"重接因果链保证前后情节连贯"）
+
+---
+
+## 事件完整字段说明
+
+```
+id, plot_id, title（10字以内）, beat_type（hook/rising/climax/resolution/transition/inciting_incident）,
+drama_weight（0~1）, importance（0~1）, estimated_minutes, characters（列表）, locations（列表）,
+source_chapters（列表，改编新增可为[]）, synopsis（50字以内）, description（200字以内）
+```
+
+---
+
+## 输出格式
+
+请严格按以下 JSON 数组格式输出，不要输出额外文字：
+
+```json
+[
+  {
+    "op": "remove_node",
+    "event_id": "P02-E03",
+    "reason": "删除此节点以完成 delete_plot P02 的整体删除"
+  },
+  {
+    "op": "remove_edge",
+    "src_id": "P01-E05",
+    "dst_id": "P02-E01",
+    "reason": "删除跨 Plot 入边，因为 P02 整体被删除"
+  },
+  {
+    "op": "add_edge",
+    "src_id": "P01-E05",
+    "dst_id": "P03-E01",
+    "edge_type": "causes",
+    "causal_strength": 0.75,
+    "reason": "重接因果链：P01-E05 的原下游 P02 被删除，P03-E01 是下一个叙事节点，因果上可直连"
+  },
+  {
+    "op": "add_node",
+    "event": {
+      "id": "P01-E08",
+      "plot_id": "P01",
+      "title": "过渡事件标题",
+      "beat_type": "transition",
+      "drama_weight": 0.4,
+      "importance": 0.3,
+      "estimated_minutes": 2.0,
+      "characters": ["角色A"],
+      "locations": ["场景X"],
+      "source_chapters": [],
+      "synopsis": "承接上文，引入下一段情节",
+      "description": "事件完整描述"
+    },
+    "reason": "P01-E05 与 P03-E01 之间因果跨度过大，新增过渡节点保证叙事连贯"
+  },
+  {
+    "op": "modify_node",
+    "event_id": "P01-E07",
+    "fields": {
+      "beat_type": "climax",
+      "drama_weight": 0.9,
+      "synopsis": "修改后的简述"
+    },
+    "reason": "压缩后需上调此节点的戏剧权重，承接新的叙事节奏"
+  }
+]
+```

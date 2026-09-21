@@ -1,0 +1,3 @@
+# NMF v2_7 核心运行链唯一第三方依赖
+# 其余全部为 Python 标准库（argparse/json/re/pathlib/collections/statistics 等）
+openai>=1.0.0

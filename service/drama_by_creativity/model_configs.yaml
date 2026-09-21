@@ -1,0 +1,100 @@
+# 模型配置文件
+# 统一管理所有LLM模型调用配置，方便后续统一调整
+# 修改对应模型的 model 字段即可切换该类任务使用的模型
+
+# ============================================================
+# 生成类模型（按任务类型细分）
+# ============================================================
+
+# 世界观生成模型
+world_view_model:
+  model: "qwen-local"
+  system_prompt: "You are an AI assistant that helps people find information."
+  temperature: 1.0
+  top_p: 1
+  top_k: 50
+  max_length: 64000
+  max_new_tokens: 16384
+
+# 人设生成模型
+role_model:
+  model: "qwen-local"
+  system_prompt: "You are an AI assistant that helps people find information."
+  temperature: 1.0
+  top_p: 1
+  top_k: 50
+  max_length: 64000
+  max_new_tokens: 16384
+
+# 卡点规划生成模型
+plot_point_model:
+  model: "qwen-local"
+  system_prompt: "You are an AI assistant that helps people find information."
+  temperature: 1.0
+  top_p: 1
+  top_k: 50
+  max_length: 64000
+  max_new_tokens: 16384
+
+# 故事大纲生成模型
+story_outline_model:
+  model: "qwen-local"
+  system_prompt: "You are an AI assistant that helps people find information."
+  temperature: 1.0
+  top_p: 1
+  top_k: 50
+  max_length: 64000
+  max_new_tokens: 16384
+
+# 集大纲生成模型
+episode_outline_model:
+  model: "qwen-local"
+  system_prompt: "You are an AI assistant that helps people find information."
+  temperature: 1.0
+  top_p: 1
+  top_k: 50
+  max_length: 64000
+  max_new_tokens: 32768
+
+# Future Map 与分集贡献映射模型
+future_map_model:
+  model: "qwen-local"
+  system_prompt: "You are an AI assistant that helps people find information."
+  temperature: 0.4
+  top_p: 1
+  top_k: 50
+  max_length: 64000
+  max_new_tokens: 32768
+
+# 场次大纲生成模型
+scene_outline_model:
+  model: "qwen-local"
+  system_prompt: "You are an AI assistant that helps people find information."
+  temperature: 1.0
+  top_p: 1
+  top_k: 50
+  max_length: 32000
+  max_new_tokens: 32000
+
+# 剧本生成模型（场次剧情、整集剧本、连贯性润色）
+script_model:
+  model: "qwen-local"
+  system_prompt: "You are an AI assistant that helps people find information."
+  temperature: 1.0
+  top_p: 1
+  top_k: 50
+  max_length: 32000
+  max_new_tokens: 32000
+
+# ============================================================
+# 辅助模型（JSON格式修正、摘要提取等轻量任务）
+# ============================================================
+
+auxiliary_model:
+  model: "qwen-local"
+  system_prompt: "You are an AI assistant that helps people find information."
+  temperature: 0.4
+  top_p: 1
+  top_k: 50
+  max_length: 20000
+  max_new_tokens: 20000

@@ -1,0 +1,67 @@
+global:
+  namespace: Development
+  env_name: test
+
+server:
+  app: script
+  server: drama_operator
+  bin_path: /data/workspace/drama_operator-master/drama_operator
+  conf_path: /data/workspace/drama_operator-master/drama_operator
+  data_path: /data/workspace/drama_operator-master/drama_operator
+  service:
+    - name: trpc.script.drama_operator.DramaByCreativity
+      ip: 0.0.0.0
+      port: 8000
+      network: tcp
+      protocol: trpc
+      timeout: 60000
+    - name: trpc.script.drama_operator.DramaByFiction
+      ip: 0.0.0.0
+      port: 8001
+      network: tcp
+      protocol: trpc
+      timeout: 60000
+    - name: trpc.script.drama_operator.ShortDramaByFiction
+      ip: 0.0.0.0
+      port: 8002
+      network: tcp
+      protocol: trpc
+      timeout: 60000
+    - name: trpc.script.drama_operator.ShortAnimeByFiction
+      ip: 0.0.0.0
+      port: 8003
+      network: tcp
+      protocol: trpc
+      timeout: 60000
+
+client:
+  timeout: 3000
+  service:
+    # COS client，名称必须与代码中 trpc.script.drama_operator.CommonCos 一致
+    - name: trpc.script.drama_operator.CommonCos
+      # 格式: innercos://<secretid>:<secretkey>@<schema>://<cos内网域名>/<bucket>-<appid>.<domain>
+      #   schema 通常为 http 或 https；以下为占位，请替换为真实 COS 凭证与地址
+      target: innercos://REPLACE_SECRETID:REPLACE_SECRETKEY@http://REPLACE_ADDR/bucket-1250000000.cos.ap-guangzhou.myqcloud.com
+      network: tcp
+      protocol: http
+      timeout: 5000
+
+plugins:
+  log:
+    default:
+      - writer: console
+        level: debug
+
+# ===== 以下为业务代码直接读取的 LLM 网关配置（顶层键）=====
+API_URLS:
+  venus: <VENUS_ENDPOINT>            # 必填：短剧/创意主链路用的 Venus LLM 网关地址
+  taiji: <TAIJI_ENDPOINT>            # 选填：shortanime 用
+  openai_compatible: <OPENAI_COMPATIBLE_ENDPOINT>  # 选填：shortanime 用
+API_KEYS:
+  venus: <VENUS_TOKEN>               # 必填
+  taiji: <TAIJI_TOKEN>               # 选填
+  openai_compatible: <OPENAI_COMPATIBLE_TOKEN>  # 选填
+
+# ===== 业务模型选择（service.shortanime_by_fiction 在 import 时强制读取）=====
+short_anime:
+  model_name: gemini-2.5-pro

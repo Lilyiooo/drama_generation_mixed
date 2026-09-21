@@ -1,0 +1,69 @@
+## 角色
+
+你是一位资深的叙事改编专家，擅长将自然语言改编方案拆解为可执行的结构化操作。
+
+## 任务
+
+以下是一份短番动画的**改编方案**，以及对应的原著因果情节图（G₀）事件列表。请将改编方案拆解为一组**结构化改编操作**，每条操作对应一个明确的图修改动作。
+
+## 改编方案
+
+{AdaptationProposal}
+
+## G₀ 事件列表（精简版）
+
+{G0EventsSummary}
+
+## 操作类型说明
+
+| op 类型  | 含义                          | 必填参数                                  |
+|----------|-------------------------------|-------------------------------------------|
+| delete   | 删除指定事件（自动桥接前后因果链）| event_id                                  |
+| compress | 将多个事件合并为一个            | src_ids（列表），new_title，reason        |
+| expand   | 将一个事件拆分为多个            | src_id，new_events（标题列表），reason    |
+| modify   | 修改事件的字段内容              | event_id，fields（key-value 字典），reason|
+| insert   | 在指定事件后插入新事件          | after_id（可为null），new_title，reason   |
+
+## 注意事项
+
+1. 每条操作尽量对应改编方案中一个具体意图
+2. event_id 必须来自 G₀ 事件列表，不要捏造不存在的 ID
+3. **compress** 的 src_ids 中的事件必须都存在于 G₀ 中
+4. **modify** 只修改需要变动的字段，不需要列出所有字段
+5. 操作应按执行顺序排列（先 delete/compress，再 modify，最后 insert）
+6. 若改编方案中某条指令无法对应到具体事件，可跳过
+
+## 输出格式
+
+请严格按以下 JSON 数组格式输出，不要输出额外文字：
+
+```json
+[
+  {
+    "op": "delete",
+    "event_id": "P02-E03",
+    "reason": "该事件与改编方案中删除XX情节的指令对应"
+  },
+  {
+    "op": "compress",
+    "src_ids": ["P01-E05", "P01-E06"],
+    "new_title": "合并后事件标题",
+    "reason": "两场戏可合并为一场，节省时长"
+  },
+  {
+    "op": "modify",
+    "event_id": "P03-E02",
+    "fields": {
+      "beat_type": "climax",
+      "drama_weight": 0.9
+    },
+    "reason": "改编方案要求强化此处戏剧冲突"
+  },
+  {
+    "op": "insert",
+    "after_id": "P02-E07",
+    "new_title": "新增事件标题",
+    "reason": "改编方案新增XX情节"
+  }
+]
+```

@@ -1,0 +1,73 @@
+# proxy pypi
+--index-url https://mirrors.cloud.tencent.com/pypi/simple/
+# private pypi
+--extra-index-url https://mirrors.tencent.com/repository/pypi/tencent_pypi/simple/
+
+
+# Install package need
+
+wheel
+
+# add the requirements for trpc project
+
+protobuf
+PyYAML
+aiohttp
+netifaces
+concurrent-log-asyncio
+automaxprocs
+Cython
+six
+pytest
+python-snappy
+uvloop
+python-gflags
+setproctitle
+
+# trpc framework and plugins
+
+trpc>=0.6.3
+
+# trpc plugins
+# trpc-log-atta
+# trpc-metrics-m007
+trpc-metrics-runtime
+trpc-naming-polaris
+# trpc-opentracing-tjg
+trpc-validation
+trpc_opentelemetry_galileo
+trpc-rainbow
+
+# sdk
+
+# attaapi
+# m007-metrics
+# polaris-python<0.3.2
+# tconf-python
+# tjg-opentracing
+
+typing_extensions
+cos_orm==0.1.2
+dataclasses_json
+trpc_cos
+cos-python-sdk-v5
+sseclient-py==1.7.2
+json_repair
+tqdm
+jsonlines
+jsonschema
+llm-proxy-sdk
+requests
+Jinja2
+cn2an
+
+# dnmg
+networkx>=3.0
+chromadb==1.5.9
+
+# add for your project
+# Add the stub package like this:
+#
+#
+trpc_script_drama_operator @ git+http://git.woa.com/trpc-python-stubhub/script/drama_operator.git@drama_operator/v1.1.36
+git+http://git.woa.com/trpc-python-stubhub/aigc/trope_engine.git@v1.1.6

@@ -1,0 +1,126 @@
+## 角色
+
+你是一位资深短番编剧，负责根据改编指令和局部故事上下文，生成修改后的事件内容。
+
+## 任务
+
+以下是一批需要处理的**改编操作**，每条操作附带了与其相关的**局部因果子图**（前驱和后继事件）。请根据改编指令和上下文，输出每个操作的**具体执行结果**。
+
+## 改编方案（全局参考）
+
+{AdaptationProposal}
+
+## 待处理操作与局部上下文
+
+{OpsWithContext}
+
+## 输出说明
+
+对每条操作，输出对应的 `patch` 结果：
+
+- **delete**：直接返回 `{"op": "delete", "event_id": "xxx"}`（无需更多内容）
+- **compress**：返回合并后的新事件完整字段
+- **expand**：返回拆分后的多个新事件完整字段列表
+- **modify**：返回需要修改的字段（只列出变更的字段）
+- **insert**：返回新事件的完整字段
+
+每个事件的完整字段包括：
+- `id`：新事件使用 `{PlotId}-E{编号}` 格式，修改/删除保持原 id
+- `plot_id`：所属 Plot ID
+- `title`：事件标题（10字内）
+- `beat_type`：hook / rising / climax / resolution / transition / inciting_incident
+- `drama_weight`：0.0~1.0
+- `estimated_minutes`：估算时长（分钟）
+- `characters`：涉及角色列表
+- `locations`：涉及场景列表
+- `source_chapters`：来源章节列表（改编新增可为 `[]`）
+- `synopsis`：事件简述（50字以内）
+- `description`：完整事件描述（200字以内）
+
+## 输出格式
+
+请严格按以下 JSON 数组格式输出，不要输出额外文字：
+
+```json
+[
+  {
+    "op": "delete",
+    "event_id": "P02-E03"
+  },
+  {
+    "op": "compress",
+    "src_ids": ["P01-E05", "P01-E06"],
+    "result_event": {
+      "id": "P01-E05",
+      "plot_id": "P01",
+      "title": "合并后标题",
+      "beat_type": "rising",
+      "drama_weight": 0.75,
+      "estimated_minutes": 5.0,
+      "characters": ["角色A"],
+      "locations": ["场景X"],
+      "source_chapters": [12, 13],
+      "synopsis": "事件简述",
+      "description": "事件完整描述"
+    }
+  },
+  {
+    "op": "expand",
+    "src_id": "P03-E04",
+    "result_events": [
+      {
+        "id": "P03-E04",
+        "plot_id": "P03",
+        "title": "拆分事件A",
+        "beat_type": "rising",
+        "drama_weight": 0.6,
+        "estimated_minutes": 3.0,
+        "characters": ["角色A"],
+        "locations": ["场景Y"],
+        "source_chapters": [20],
+        "synopsis": "简述A",
+        "description": "描述A"
+      },
+      {
+        "id": "P03-E99",
+        "plot_id": "P03",
+        "title": "拆分事件B",
+        "beat_type": "climax",
+        "drama_weight": 0.85,
+        "estimated_minutes": 4.0,
+        "characters": ["角色A", "角色B"],
+        "locations": ["场景Z"],
+        "source_chapters": [21],
+        "synopsis": "简述B",
+        "description": "描述B"
+      }
+    ]
+  },
+  {
+    "op": "modify",
+    "event_id": "P03-E02",
+    "fields": {
+      "beat_type": "climax",
+      "drama_weight": 0.9,
+      "synopsis": "修改后的简述"
+    }
+  },
+  {
+    "op": "insert",
+    "after_id": "P02-E07",
+    "result_event": {
+      "id": "P02-E99",
+      "plot_id": "P02",
+      "title": "新增事件标题",
+      "beat_type": "hook",
+      "drama_weight": 0.8,
+      "estimated_minutes": 3.5,
+      "characters": ["角色C"],
+      "locations": ["场景W"],
+      "source_chapters": [],
+      "synopsis": "新增事件简述",
+      "description": "新增事件完整描述"
+    }
+  }
+]
+```

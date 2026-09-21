@@ -1,0 +1,4 @@
+# 复用项目内 VenusClient 所依赖的请求库
+requests>=2.31
+PyYAML>=6.0
+sseclient-py>=1.8

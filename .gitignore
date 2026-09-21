@@ -1,0 +1,92 @@
+# ide settings
+.idea
+.vscode
+.codebuddy
+
+# mac temp file
+.DS_Store
+
+# env
+venv
+.venv
+.noxenv
+
+# build
+*.py[cod]
+*.egg-info
+*.egg
+.eggs
+eggs
+build
+dist
+__pycache__
+
+# logs
+logs
+*.log
+*.log*
+*.out
+nohup*
+*.lock
+
+# pytest
+.pytest_cache
+# pytest report
+htmlcov
+
+# coverage
+*.coverage
+*.coverage.*
+pytest.cov.tmp
+
+# cache
+.polaris_cache
+.cache
+.codereview
+
+
+trpc_python.yaml
+py_trpc_frame.log
+release
+/test_*.py
+/pack_upload.sh
+service/drama_by_fiction/test_*.py
+service/shortdrama_by_fiction/core/*.bk
+service/shortdrama_by_fiction/*.bk
+service/shortdrama_by_fiction/prompts/analyze/*.bk
+service/shortdrama_by_fiction/tests
+service/shortdrama_by_fiction/tests/*
+service/drama_by_fiction/tools/log_request.py
+CLAUDE.md
+
+
+# short_anime
+.agent
+.claude
+.codex
+data/
+test/
+.agents/
+deploy.sh
+
+# Local generation artifacts and private configuration
+/output/*
+!/output/qwen36_27b_eight_fields_demo_20260916_060508_407704/
+/localization_backup/
+.env
+.env.*
+!.env.example
+
+# Local models and vLLM caches are never versioned.
+/models/
+/cache/
+/tmp/
+/vendor/**/__pycache__/
+/evaluation/**/output/
+/evaluation/**/web_jobs/
+
+# Keep the vendored protocol assets and small benchmark reports.
+!vendor/tencent_drama/nmf_v2_7_package/narrative_memory_feedback_v2_7_self_evolving/data/
+!vendor/tencent_drama/nmf_v2_7_package/narrative_memory_feedback_v2_7_self_evolving/data/**
+!results/
+!results/*.md

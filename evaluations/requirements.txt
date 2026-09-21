@@ -1,0 +1,6 @@
+numpy>=1.24
+requests>=2.31
+PyYAML>=6.0
+sseclient-py>=1.8
+# Recommended for paper-aligned semantic homogeneity:
+# sentence-transformers>=2.2

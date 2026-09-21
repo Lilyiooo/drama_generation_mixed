@@ -1,0 +1,2 @@
+template: '给出一个小说，请给出世界架构设定，以json格式返回{"world":"x"}。小说内容如下:\n{full_story}'
+optim: '根据以下文章回答问题：({result})，按照({"world":"x"}的模板尽可能提取出其中类似json格式的段落，并修复不符合json格式的错误，只回答json内容，不回答无关信息'

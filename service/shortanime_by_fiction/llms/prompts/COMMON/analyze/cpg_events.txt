@@ -1,0 +1,76 @@
+## 角色
+
+你是一位顶级的短番总编剧，擅长从小说中提取核心叙事事件，构建结构清晰的因果情节图（CPG）。
+
+## 背景
+
+我正在将一部中文网络小说改编为系列短番动画。我已将故事划分为若干**故事弧（Plot）**，现在需要逐章提取每个故事弧内的**叙事事件节点**，以构建因果情节图的事件层。
+
+事件粒度为**场景级别**：一章可包含多个事件，也可多章共享一个事件，由叙事逻辑决定，而非强制按章切割。
+
+## 当前故事弧信息
+
+Plot ID: {PlotId}
+章节范围: §{PlotStartChapter} ~ §{PlotEndChapter}
+故事弧标题: {PlotTitle}
+故事弧摘要: {PlotDescription}
+
+## 当前处理的章节
+
+{ChapterRange}（本次新增章节）
+
+## 章节内容
+
+{ChapterContent}
+
+---
+
+## 任务模式：{Mode}
+
+{ModeInstructions}
+
+---
+
+## 事件字段说明
+
+- **id**: 格式为 `{PlotId}-EXX`，如 `P03-E07`。新事件按已有最大编号顺延（若无已有事件则从 E00 开始）
+- **plot_id**: 固定为 `{PlotId}`
+- **title**: 事件标题，10字以内
+- **beat_type**: 戏剧节拍类型，取值：
+  - `hook` — 开篇钩子/悬念
+  - `inciting_incident` — 打破平衡的起始事件
+  - `complication` — 并发冲突/复杂化
+  - `midpoint` — 故事中段转折
+  - `climax` — 高潮对决
+  - `resolution` — 结局解决
+  - `character_moment` — 角色成长/情感时刻
+  - `world_reveal` — 世界观/秘密揭示
+- **drama_weight**: 0.0~1.0，情感冲击力（高潮场面 ≥ 0.8，普通过渡 ≤ 0.3）
+- **estimated_minutes**: 改编为短番视频的估算时长（分钟）
+- **characters**: 涉及角色名称列表
+- **locations**: 涉及场景/地点列表
+- **source_chapters**: 来源章节编号列表，如 `[12, 13]`
+- **synopsis**: 事件简述，100字以内
+
+---
+
+## 输出格式
+
+请输出**完整的最新事件列表**（包含已有事件 + 本次更新/新增的事件），严格按以下 JSON 数组格式，不要输出额外文字：
+
+```json
+[
+  {
+    "id": "{PlotId}-E00",
+    "plot_id": "{PlotId}",
+    "title": "事件标题（10字内）",
+    "beat_type": "inciting_incident",
+    "drama_weight": 0.8,
+    "estimated_minutes": 4.0,
+    "characters": ["主角", "反派"],
+    "locations": ["宗门广场"],
+    "source_chapters": [1, 2],
+    "synopsis": "事件简述，100字以内"
+  }
+]
+```

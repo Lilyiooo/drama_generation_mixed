@@ -1,0 +1,58 @@
+# 剧本生成配置
+# 优先级：trpc_python.yaml > generation_config.yaml > FictionConfig 默认值
+
+model_name: gemini-2.5-pro       # 对应 llms/model_config.yaml 中的 model key
+chapter_block_cnt: 50
+overlap_chapter_cnt: 10
+arc_range: "5～10章"
+max_workers: 8
+retry_cnt: 3
+
+# 剧本字数校验与自动修正开关
+enable_script_fix: true
+
+# LLM调用参数
+llm_caller:
+  temperature: 0.6
+  max_new_tokens: 32768
+  max_tokens: 64000
+  max_completion_tokens: 32000
+  max_retries: 3
+  retry_delay: 60
+  use_cache: false
+  use_io_log: false
+  llm_provider: "venus"  # 可选: venus | taiji
+
+# 剧本生成方法：parallel（并行）/ sequential（逐集串行）
+script_generate_method: sequential
+# CPG相关配置
+episode_outline_method: sequential      # 分集大纲生成方法：cpg / sequential
+cpg:
+  candidate_top_k: 10                   # 每个事件最多关联的邻居数（候选对筛选 Top-K）
+  candidate_max_chapter_dist: 30        # 候选对筛选时允许的最大章节距离（超出则跳过）
+  max_candidate_pairs: 500              # 候选对总量上限
+  edges_batch_size: 50                  # 每批送给 LLM 的候选对数量
+  emb_top_k: 5                          # embedding 第二路每个事件最多取多少相似邻居
+  emb_sim_threshold: 0.75               # embedding 相似度阈值
+  emb_model: "server:251477"            # venus embedding 模型
+
+
+# 缓存参数
+cache:
+  max_size: 50000
+  cache_dir: "../.cache/llm_cache"
+
+# 动态叙事记忆图谱（DNMG）
+use_memory_graph: false
+dnmg:
+  state_max_entities: 2000              # 节点+边总数上限，超出时 LRU 淘汰
+  state_fallback_recent_n: 20           # ChromaDB 检索失败时 fallback 的最近 N 个实体
+  state_retrieve_top_k: 15             # ChromaDB 语义检索返回 top-K 实体
+  state_extract_top_k: 20              # LLM 从大纲抽取实体后，按置信度保留 top-K 个
+  state_bar_max_items: 50              # retrieve_state_bar 子图输出的节点+边总数上限（按置信度排序截断）
+  state_bar_expand_1hop: true          # retrieve 时是否做 1-hop 邻居扩展；false 则只保留种子节点（0-hop）
+  state_bar_neighbor_discount: 0.7     # 1-hop 扩展节点的置信度折扣系数
+  dedup_levenshtein_threshold: 2       # EntityLinker Levenshtein 编辑距离阈值
+  dedup_vector_sim_threshold: 0.85     # ChromaDB 向量相似度阈值（cosine similarity，超过则认为重复）
+  dedup_l3_candidate_top_k: 5         # L3 LLM dedup 每个新实体召回的同类型候选数
+  extract_model_name: qwen3.6-35b-a3b
