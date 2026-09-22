@@ -1,0 +1,89 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+EVAL_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+PYTHON_BIN="${PYTHON_BIN:-/inspire/qb-ilm/project/exploration-topic/wangqiqi-CZXS25210124/anaconda3/envs/qwen36-vllm/bin/python}"
+SCRIPT_ROOT="${SCRIPT_ROOT:-/inspire/hdd/global_user/wangqiqi-CZXS25210124/ScriptPipeline}"
+EXPERIMENT_ROOT="$SCRIPT_ROOT/output/full_scene_gate_ab_v1"
+LOG_ROOT="$SCRIPT_ROOT/logs"
+ACTION="${1:-run}"
+
+export DRAMA_EVAL_BASE_URL="${DRAMA_EVAL_BASE_URL:-http://127.0.0.1:8001/v1}"
+export DRAMA_EVAL_API_KEY="${DRAMA_EVAL_API_KEY:-EMPTY}"
+export DRAMA_EVAL_MODEL=Qwen3.8-27B
+export DRAMA_EVAL_TEMPERATURE=0
+export DRAMA_EVAL_ENABLE_THINKING=false
+export PYTHONUNBUFFERED=1
+
+arms=(control_hybrid candidate_gate)
+
+prepare_inputs() {
+  mkdir -p "$LOG_ROOT"
+  for arm in "${arms[@]}"; do
+    "$PYTHON_BIN" "$EVAL_DIR/tools/export_pipeline_script.py" \
+      "$EXPERIMENT_ROOT/$arm/R01" \
+      "$EXPERIMENT_ROOT/$arm/R01/drama_evaluator_logic_quality_input/full_60_episodes.txt"
+  done
+}
+
+run_one() {
+  local arm="$1"
+  shift
+  "$PYTHON_BIN" "$EVAL_DIR/evaluate_multi_agent.py" \
+    "$EXPERIMENT_ROOT/$arm/R01/drama_evaluator_logic_quality_input/full_60_episodes.txt" \
+    --output-dir "$EXPERIMENT_ROOT/$arm/R01/drama_evaluations_logic_quality_qwen38/full_60_episodes" \
+    --model Qwen3.8-27B --context-mode direct --direct-char-limit 300000 --chunk-chars 100000 \
+    --review-workers 2 --audit-workers 2 --arbitration-workers 2 \
+    --max-output-tokens 16000 --timeout 1200 --retries 3 --parse-retries 2 "$@"
+}
+
+case "$ACTION" in
+  prepare)
+    prepare_inputs
+    "$PYTHON_BIN" "$EVAL_DIR/summarize_full_scene_gate_r01.py"
+    ;;
+  dry-run)
+    prepare_inputs
+    for arm in "${arms[@]}"; do
+      run_one "$arm" --dry-run
+    done
+    ;;
+  status)
+    "$PYTHON_BIN" "$EVAL_DIR/summarize_full_scene_gate_r01.py"
+    ;;
+  report)
+    "$PYTHON_BIN" "$EVAL_DIR/summarize_full_scene_gate_r01.py" --write
+    ;;
+  run)
+    prepare_inputs
+    models="$(curl --noproxy '*' --fail --silent --show-error "$DRAMA_EVAL_BASE_URL/models")"
+    if [[ "$models" != *'Qwen3.8-27B'* ]]; then
+      echo "端口上的服务未返回 Qwen3.8-27B：$DRAMA_EVAL_BASE_URL/models" >&2
+      exit 1
+    fi
+    exec 9>"$EXPERIMENT_ROOT/.logic_quality_r01.lock"
+    flock -n 9 || { echo 'R01 逻辑质量评测已经在运行' >&2; exit 2; }
+    pids=()
+    for arm in "${arms[@]}"; do
+      (set -o pipefail; run_one "$arm" 2>&1 | tee -a "$LOG_ROOT/full_scene_gate_logic_quality_${arm}.log") &
+      pid="$!"
+      pids+=("$pid")
+      echo "$arm PID=$pid log=$LOG_ROOT/full_scene_gate_logic_quality_${arm}.log"
+    done
+    failed=0
+    for index in "${!pids[@]}"; do
+      if wait "${pids[index]}"; then code=0; else code=$?; failed=1; fi
+      echo "${arms[index]} exit_code=$code"
+    done
+    "$PYTHON_BIN" "$EVAL_DIR/summarize_full_scene_gate_r01.py"
+    if [[ "$failed" -ne 0 ]]; then
+      echo '部分评测未完成；结果已保留，修复服务问题后重跑同一命令即可续跑。' >&2
+      exit 1
+    fi
+    "$PYTHON_BIN" "$EVAL_DIR/summarize_full_scene_gate_r01.py" --write
+    ;;
+  *)
+    echo '用法：run_full_scene_gate_r01.sh {prepare|dry-run|run|status|report}' >&2
+    exit 2
+    ;;
+esac
