@@ -48,6 +48,8 @@
 
 配套对比中的 direct baseline 是“本集大纲 + 此前全部剧集原文 → 单次直接写作”，不走本仓库的场次 Agent、状态记忆、检索和门控。
 
+该 baseline 的独立生成、恢复、评测与汇总入口为 `outline_history_baseline.sh` 和 `tools/outline_history_baseline.py`，复现说明见 `OUTLINE_HISTORY_BASELINE.md`。驱动中对 `candidate_gate` 和 `control_hybrid` 的引用只用于核验冻结输入和读取已完成分数，不会执行两种方法。
+
 ## 目录结构
 
 ```text

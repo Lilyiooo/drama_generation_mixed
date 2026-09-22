@@ -1,5 +1,6 @@
 # Local 60-episode creativity pipeline; no Tencent package indexes or SDKs.
 requests>=2.28
+transformers>=4.57,<5
 Jinja2>=3.1
 PyYAML>=6.0
 json-repair>=0.30
